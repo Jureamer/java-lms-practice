@@ -28,11 +28,13 @@ public class CourseRepositoryTest {
 
     @Test
     void crud() {
-        Course course = new Course("TDD, 클린 코드 with Java", 1L);
+        Course course = new Course("TDD, 클린 코드 with Java", 1L, 1);
         int count = courseRepository.save(course);
         assertThat(count).isEqualTo(1);
         Course savedCourse = courseRepository.findById(1L);
         assertThat(course.getTitle()).isEqualTo(savedCourse.getTitle());
+        assertThat(course.getCreatorId()).isEqualTo(savedCourse.getCreatorId());
+        assertThat(course.getCohort()).isEqualTo(savedCourse.getCohort());
         LOGGER.debug("Course: {}", savedCourse);
     }
 }
