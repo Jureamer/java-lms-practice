@@ -73,15 +73,8 @@ public class Question {
         return writer.equals(loginUser);
     }
 
-    public Question setDeleted(boolean deleted, NsUser loginUser) throws CannotDeleteException {
-        return this;
-    }
-
     private void checkAnswersOwner(NsUser loginUser) throws CannotDeleteException {
-        boolean found = answers.stream()
-                .filter(answer -> !answer.isOwner(loginUser))
-                .findAny()
-                .isPresent();
+        boolean found = answers.stream().filter(answer -> !answer.isOwner(loginUser)).findAny().isPresent();
 
         if (found) {
             throw new CannotDeleteException("다른 사람이 쓴 답변이 있어 삭제할 수 없습니다.");
@@ -114,12 +107,16 @@ public class Question {
         List<DeleteHistory> deleteHistories = new ArrayList<>();
         deleteHistories.add(new DeleteHistory(ContentType.QUESTION, id, writer, LocalDateTime.now()));
 
-        answers.stream()
-                .forEach(answer -> {
-                    answer.setDeleted(true);
-                    deleteHistories.add(new DeleteHistory(ContentType.ANSWER, answer.getId(), answer.getWriter(), LocalDateTime.now()));
-                });
+        List<DeleteHistory> answerDeleteHistories = deletAnswers();
+        deleteHistories.addAll(answerDeleteHistories);
+        return deleteHistories;
+    }
 
+    private List<DeleteHistory> deletAnswers() {
+        List<DeleteHistory> deleteHistories = new ArrayList<>();
+        answers.forEach(answer -> {
+            deleteHistories.add(answer.delete());
+        });
         return deleteHistories;
     }
 
