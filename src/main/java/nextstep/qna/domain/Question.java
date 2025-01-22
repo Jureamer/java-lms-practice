@@ -1,5 +1,6 @@
 package nextstep.qna.domain;
 
+import nextstep.qna.CannotDeleteException;
 import nextstep.users.domain.NsUser;
 
 import java.time.LocalDateTime;
@@ -68,13 +69,29 @@ public class Question {
         answers.add(answer);
     }
 
-    public boolean isOwner(NsUser loginUser) {
+    private boolean isOwner(NsUser loginUser) {
         return writer.equals(loginUser);
     }
 
-    public Question setDeleted(boolean deleted) {
-        this.deleted = deleted;
+    public Question setDeleted(boolean deleted, NsUser loginUser) throws CannotDeleteException {
         return this;
+    }
+
+    private void checkAnswersOwner(NsUser loginUser) throws CannotDeleteException {
+        boolean found = answers.stream()
+                .filter(answer -> !answer.isOwner(loginUser))
+                .findAny()
+                .isPresent();
+
+        if (found) {
+            throw new CannotDeleteException("다른 사람이 쓴 답변이 있어 삭제할 수 없습니다.");
+        }
+    }
+
+    private void checkIsOwner(NsUser loginUser) throws CannotDeleteException {
+        if (!isOwner(loginUser)) {
+            throw new CannotDeleteException("질문을 삭제할 권한이 없습니다.");
+        }
     }
 
     public boolean isDeleted() {
@@ -88,5 +105,26 @@ public class Question {
     @Override
     public String toString() {
         return "Question [id=" + getId() + ", title=" + title + ", contents=" + contents + ", writer=" + writer + "]";
+    }
+
+    public List<DeleteHistory> delete(NsUser loginUser) throws CannotDeleteException {
+        checkValidation(loginUser);
+        this.deleted = true;
+
+        List<DeleteHistory> deleteHistories = new ArrayList<>();
+        deleteHistories.add(new DeleteHistory(ContentType.QUESTION, id, writer, LocalDateTime.now()));
+
+        answers.stream()
+                .forEach(answer -> {
+                    answer.setDeleted(true);
+                    deleteHistories.add(new DeleteHistory(ContentType.ANSWER, answer.getId(), answer.getWriter(), LocalDateTime.now()));
+                });
+
+        return deleteHistories;
+    }
+
+    private void checkValidation(NsUser loginUser) throws CannotDeleteException {
+        checkIsOwner(loginUser);
+        checkAnswersOwner(loginUser);
     }
 }
