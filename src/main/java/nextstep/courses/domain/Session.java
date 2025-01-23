@@ -1,24 +1,23 @@
 package nextstep.courses.domain;
 
 public class Session {
-    private String startDateTime;
-    private String endDateTime;
+    private SessionDate sessionDate;
     private CoverImage coverImage;
     private Status status;
 
     public Session(String startDateTime, String endDateTime, CoverImage coverImage, Status status) {
-        this.startDateTime = startDateTime;
-        this.endDateTime = endDateTime;
+        this.sessionDate = new SessionDate(startDateTime, endDateTime);
         this.coverImage = coverImage;
         this.status = status;
+
     }
 
     public String getStartDateTime() {
-        return startDateTime;
+        return sessionDate.getStartDateTime();
     }
 
     public String getEndDateTime() {
-        return endDateTime;
+        return sessionDate.getEndDateTime();
     }
 
     public CoverImage getCoverImage() {
