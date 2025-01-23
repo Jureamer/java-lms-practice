@@ -1,0 +1,30 @@
+package nextstep.courses.domain;
+
+import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+public class SessionTest {
+    CoverImage coverImage = new CoverImage(100, ImageType.JPEG, 100, 100);
+    Status readyStatus = Status.READY;
+
+    @Test
+    void 강의는_시작일과_종료일을_가진다() {
+        Session session = new Session("2021-08-01", "2021-08-08", coverImage, readyStatus);
+        assertThat(session.getStartDateTime()).isEqualTo("2021-08-01");
+        assertThat(session.getEndDateTime()).isEqualTo("2021-08-08");
+    }
+
+    @Test
+    void 강의는_커버_이미지를_가진다() {
+        CoverImage coverImage = new CoverImage(100, ImageType.JPEG, 100, 100);
+        Session session = new Session("2021-08-01", "2021-08-08", coverImage, Status.READY);
+        assertThat(session.getCoverImage()).isEqualTo(coverImage);
+    }
+
+    @Test
+    void 강의는_상태를_가진다() {
+        Session session = new Session("2021-08-01", "2021-08-08", coverImage, readyStatus);
+        assertThat(session.getStatus()).isEqualTo(readyStatus);
+    }
+}
