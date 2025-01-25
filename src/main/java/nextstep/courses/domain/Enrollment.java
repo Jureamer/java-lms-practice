@@ -1,5 +1,6 @@
 package nextstep.courses.domain;
 
+import nextstep.payments.service.PaymentService;
 import nextstep.users.domain.NsUser;
 
 import java.util.ArrayList;
@@ -35,15 +36,19 @@ public class Enrollment {
         this.status = status;
     }
 
-    public boolean isEnrolled(NsUser user) {
-        return users.contains(user);
-    }
-
     public boolean isOpen() {
         return status == Status.OPEN;
     }
 
     public Status getStatus() {
         return status;
+    }
+
+    public void enroll(NsUser user) {
+        users.add(user);
+    }
+
+    public boolean isEnrolled(NsUser user) {
+        return users.contains(user);
     }
 }

@@ -9,7 +9,7 @@ public class Payment {
     private Long sessionId;
 
     // 결제한 사용자 아이디
-    private Long nsUserId;
+    private String nsUserId;
 
     // 결제 금액
     private Long amount;
@@ -19,7 +19,7 @@ public class Payment {
     public Payment() {
     }
 
-    public Payment(String id, Long sessionId, Long nsUserId, Long amount) {
+    public Payment(String id, Long sessionId, String nsUserId, Long amount) {
         this.id = id;
         this.sessionId = sessionId;
         this.nsUserId = nsUserId;
