@@ -1,15 +1,23 @@
 package nextstep.courses.domain;
 
+import nextstep.users.domain.NsUser;
+
 public class Session {
     private SessionDate sessionDate;
     private CoverImage coverImage;
-    private Status status;
+    private Enrollment enrollment;
+    private int charge;
 
-    public Session(String startDateTime, String endDateTime, CoverImage coverImage, Status status) {
+    public Session(String startDateTime, String endDateTime, CoverImage coverImage, int charge, int capacity, Enrollment enrollment) {
         this.sessionDate = new SessionDate(startDateTime, endDateTime);
         this.coverImage = coverImage;
-        this.status = status;
+        this.charge = charge;
+        this.enrollment = enrollment;
+        
+    }
 
+    public boolean isEnrolled(NsUser user) {
+        return enrollment.isEnrolled(user);
     }
 
     public String getStartDateTime() {
@@ -24,7 +32,10 @@ public class Session {
         return coverImage;
     }
 
+    public void enroll(NsUser user) {
+    }
+
     public Status getStatus() {
-        return status;
+        return enrollment.getStatus();
     }
 }
