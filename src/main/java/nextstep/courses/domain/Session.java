@@ -3,6 +3,8 @@ package nextstep.courses.domain;
 import nextstep.payments.service.PaymentService;
 import nextstep.users.domain.NsUser;
 
+import java.util.ArrayList;
+
 public class Session {
     private SessionDate sessionDate;
     private CoverImage coverImage;
@@ -15,6 +17,13 @@ public class Session {
         this.charge = charge;
         this.enrollment = enrollment;
         
+    }
+
+    public Session(String date, String date1, CoverImage coverImage, Long charge, Enrollment enrollment, RecruitState recruitState) {
+        this.sessionDate = new SessionDate(date, date1);
+        this.coverImage = coverImage;
+        this.charge = charge;
+        this.enrollment = new Enrollment(100, new ArrayList<>(), Status.READY, recruitState);
     }
 
     public String getStartDateTime() {
@@ -46,12 +55,16 @@ public class Session {
             throw new IllegalArgumentException("이미 등록된 사용자입니다.");
         }
 
-        if (!enrollment.isOpen()) {
-            throw new IllegalArgumentException("등록할 수 없습니다.");
+        if (!enrollment.canEnroll()) {
+            throw new IllegalArgumentException("현재는 강의에 등록할 수 없는 상태입니다.");
         }
     }
 
     public Long getCharge() {
         return charge;
+    }
+
+    public RecruitState getRecruitState() {
+        return enrollment.getRecruitState();
     }
 }

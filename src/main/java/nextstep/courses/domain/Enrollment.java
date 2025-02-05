@@ -1,6 +1,5 @@
 package nextstep.courses.domain;
 
-import nextstep.payments.service.PaymentService;
 import nextstep.users.domain.NsUser;
 
 import java.util.ArrayList;
@@ -12,20 +11,23 @@ public class Enrollment {
     private int capacity;
     private List<NsUser> users;
     private Status status;
+    private RecruitState recruitState;
 
     public Enrollment() {
-        this(MAX_CAPACITY);
+        this(MAX_CAPACITY, new ArrayList<>(), Status.READY, RecruitState.OPEN);
     }
 
-    public Enrollment(int capacity) {
+    public Enrollment(int capacity, List<NsUser> users, Status status, RecruitState recruitState) {
         this.capacity = capacity;
         this.users = new ArrayList<>();
-        this.status = Status.READY;
+        this.status = status;
+        this.recruitState = recruitState;
     }
 
     public Enrollment(int capacity, Status status) {
         this(capacity, new ArrayList<>(), status);
     }
+
     public Enrollment(int capacity, List<NsUser> users) {
         this(capacity, users, Status.READY);
     }
@@ -36,8 +38,8 @@ public class Enrollment {
         this.status = status;
     }
 
-    public boolean isOpen() {
-        return status == Status.OPEN;
+    public boolean canEnroll() {
+        return isOpen() && recruitState == RecruitState.OPEN && capacity > users.size();
     }
 
     public Status getStatus() {
@@ -50,5 +52,13 @@ public class Enrollment {
 
     public boolean isEnrolled(NsUser user) {
         return users.contains(user);
+    }
+
+    public RecruitState getRecruitState() {
+        return recruitState;
+    }
+
+    private boolean isOpen() {
+        return status == Status.OPEN;
     }
 }
