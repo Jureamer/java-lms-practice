@@ -4,26 +4,19 @@ import nextstep.payments.service.PaymentService;
 import nextstep.users.domain.NsUser;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Session {
     private SessionDate sessionDate;
-    private CoverImage coverImage;
+    private List<CoverImage> coverImages;
     private Enrollment enrollment;
     private Long charge;
 
-    public Session(String startDateTime, String endDateTime, CoverImage coverImage, Long charge, Enrollment enrollment) {
-        this.sessionDate = new SessionDate(startDateTime, endDateTime);
-        this.coverImage = coverImage;
+    private Session(SessionDate sessionDate, List<CoverImage> coverImages, Long charge, Enrollment enrollment) {
+        this.sessionDate = sessionDate;
+        this.coverImages = coverImages;
         this.charge = charge;
         this.enrollment = enrollment;
-        
-    }
-
-    public Session(String date, String date1, CoverImage coverImage, Long charge, Enrollment enrollment, RecruitState recruitState) {
-        this.sessionDate = new SessionDate(date, date1);
-        this.coverImage = coverImage;
-        this.charge = charge;
-        this.enrollment = new Enrollment(100, new ArrayList<>(), Status.READY, recruitState);
     }
 
     public String getStartDateTime() {
@@ -34,8 +27,8 @@ public class Session {
         return sessionDate.getEndDateTime();
     }
 
-    public CoverImage getCoverImage() {
-        return coverImage;
+    public List<CoverImage> getCoverImages() {
+        return coverImages;
     }
 
     public void enrollUser(NsUser user) {
@@ -66,5 +59,36 @@ public class Session {
 
     public RecruitState getRecruitState() {
         return enrollment.getRecruitState();
+    }
+
+    public static class Builder {
+        private SessionDate sessionDate;
+        private List<CoverImage> coverImages = new ArrayList<>();
+        private Enrollment enrollment;
+        private Long charge;
+
+        public Builder sessionDate(SessionDate sessionDate) {
+            this.sessionDate = sessionDate;
+            return this;
+        }
+
+        public Builder coverImages(List<CoverImage> coverImages) {
+            this.coverImages = coverImages;
+            return this;
+        }
+
+        public Builder enrollment(Enrollment enrollment) {
+            this.enrollment = enrollment;
+            return this;
+        }
+
+        public Builder charge(Long charge) {
+            this.charge = charge;
+            return this;
+        }
+
+        public Session build() {
+            return new Session(sessionDate, coverImages, charge, enrollment);
+        }
     }
 }

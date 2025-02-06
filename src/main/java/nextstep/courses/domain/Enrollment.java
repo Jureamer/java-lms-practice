@@ -13,29 +13,11 @@ public class Enrollment {
     private Status status;
     private RecruitState recruitState;
 
-    public Enrollment() {
-        this(MAX_CAPACITY, new ArrayList<>(), Status.READY, RecruitState.OPEN);
-    }
-
-    public Enrollment(int capacity, List<NsUser> users, Status status, RecruitState recruitState) {
-        this.capacity = capacity;
-        this.users = new ArrayList<>();
-        this.status = status;
-        this.recruitState = recruitState;
-    }
-
-    public Enrollment(int capacity, Status status) {
-        this(capacity, new ArrayList<>(), status);
-    }
-
-    public Enrollment(int capacity, List<NsUser> users) {
-        this(capacity, users, Status.READY);
-    }
-
-    public Enrollment(int capacity, List<NsUser> users, Status status) {
+    private Enrollment(int capacity, List<NsUser> users, Status status, RecruitState recruitState) {
         this.capacity = capacity;
         this.users = users;
         this.status = status;
+        this.recruitState = recruitState;
     }
 
     public boolean canEnroll() {
@@ -61,4 +43,36 @@ public class Enrollment {
     private boolean isOpen() {
         return status == Status.OPEN;
     }
+
+    public static class Builder {
+        private int capacity = MAX_CAPACITY;
+        private List<NsUser> users = new ArrayList<>();
+        private Status status = Status.READY;
+        private RecruitState recruitState = RecruitState.OPEN;
+
+        public Builder capacity(int capacity) {
+            this.capacity = capacity;
+            return this;
+        }
+
+        public Builder users(List<NsUser> users) {
+            this.users = users;
+            return this;
+        }
+
+        public Builder status(Status status) {
+            this.status = status;
+            return this;
+        }
+
+        public Builder recruitState(RecruitState recruitState) {
+            this.recruitState = recruitState;
+            return this;
+        }
+
+        public Enrollment build() {
+            return new Enrollment(capacity, users, status, recruitState);
+        }
+    }
+
 }

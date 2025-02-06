@@ -10,8 +10,10 @@ public class SessionDateTest {
     void 강의_날짜를_생성한다() {
         String startDateTime = "2021-08-01";
         String endDateTime = "2021-08-08";
-        SessionDate sessionDate = new SessionDate(startDateTime, endDateTime);
-
+        SessionDate sessionDate = new SessionDate.Builder()
+                .startDateTime(startDateTime)
+                .endDateTime(endDateTime)
+                .build();
         assertThat(sessionDate.getStartDateTime()).isEqualTo(startDateTime);
         assertThat(sessionDate.getEndDateTime()).isEqualTo(endDateTime);
     }
@@ -21,7 +23,11 @@ public class SessionDateTest {
         String startDateTime = "2021-08-01";
         String endDateTime = "2021-08-08";
 
-        assertThatThrownBy(() -> new SessionDate(endDateTime, startDateTime))
+        assertThatThrownBy(() -> new SessionDate.Builder()
+                .startDateTime(endDateTime)
+                .endDateTime(startDateTime)
+                .build()
+        )
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("시작일이 종료일보다 늦을 수 없습니다.");
     }
@@ -31,7 +37,11 @@ public class SessionDateTest {
         String startDateTime = "2021-08-01";
         String endDateTime = "2021-08-01";
 
-        assertThatThrownBy(() -> new SessionDate(startDateTime, endDateTime))
+        assertThatThrownBy(() -> new SessionDate.Builder()
+                .startDateTime(startDateTime)
+                .endDateTime(endDateTime)
+                .build()
+        )
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("시작일과 종료일은 같은 날짜일 수 없습니다.");
     }

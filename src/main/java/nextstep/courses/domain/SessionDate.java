@@ -4,7 +4,7 @@ public class SessionDate {
     private String startDateTime;
     private String endDateTime;
 
-    public SessionDate(String startDateTime, String endDateTime) {
+    private SessionDate(String startDateTime, String endDateTime) {
         validateDateTime(startDateTime, endDateTime);
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
@@ -30,6 +30,24 @@ public class SessionDate {
         if (startDateTime.compareTo(endDateTime) > 0) {
             throw new IllegalArgumentException("시작일이 종료일보다 늦을 수 없습니다.");
         }
+    }
 
+    public static class Builder {
+        private String startDateTime;
+        private String endDateTime;
+
+        public Builder startDateTime(String startDateTime) {
+            this.startDateTime = startDateTime;
+            return this;
+        }
+
+        public Builder endDateTime(String endDateTime) {
+            this.endDateTime = endDateTime;
+            return this;
+        }
+
+        public SessionDate build() {
+            return new SessionDate(startDateTime, endDateTime);
+        }
     }
 }

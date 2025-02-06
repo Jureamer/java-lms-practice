@@ -35,6 +35,7 @@
   - [X] 결제를 완료한 결제 정보는 payments 모듈을 통해 관리되며, 결제 정보는 Payment 객체에 담겨 반한된다.
 
 ## 리팩토링 요구사항
+- [ ] Builder 패턴 적용
 - [ ] Payment Test Code 추가
 - [ ] DB 연결 로직 추가
 - [ ] 강의 등록 Payment 객체 반환
