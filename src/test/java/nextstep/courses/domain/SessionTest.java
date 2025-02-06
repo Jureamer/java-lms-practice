@@ -1,6 +1,7 @@
 package nextstep.courses.domain;
 
 import nextstep.users.domain.NsUser;
+import nextstep.users.domain.Teacher;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -21,6 +22,7 @@ public class SessionTest {
     private Long charge = 100L;
     private int capacity = 100;
     private RecruitState recruitState = RecruitState.OPEN;
+    private Teacher teacher = new Teacher(new NsUser(10L, "강사", "강사@nextstep.camp", "강사", "강사입니다."));
 
     @Test
     void 강의는_시작일과_종료일을_가진다() {
@@ -29,6 +31,7 @@ public class SessionTest {
                 .coverImages(coverImages)
                 .charge(charge)
                 .enrollment(enrollment)
+                .teacher(teacher)
                 .build();
         assertThat(session.getStartDateTime()).isEqualTo("2021-08-01");
         assertThat(session.getEndDateTime()).isEqualTo("2021-08-08");
@@ -41,6 +44,7 @@ public class SessionTest {
                 .coverImages(coverImages)
                 .charge(charge)
                 .enrollment(enrollment)
+                .teacher(teacher)
                 .build();
         assertThat(session.getCoverImages()).isEqualTo(coverImage);
     }
@@ -52,6 +56,7 @@ public class SessionTest {
                 .coverImages(coverImages)
                 .charge(charge)
                 .enrollment(enrollment)
+                .teacher(teacher)
                 .build();
         assertThat(session.getStatus()).isEqualTo(readyStatus);
     }
@@ -63,6 +68,7 @@ public class SessionTest {
                 .coverImages(coverImages)
                 .charge(0L)
                 .enrollment(enrollment)
+                .teacher(teacher)
                 .build();
         assertThat(session.isFree()).isTrue();
     }
@@ -74,6 +80,7 @@ public class SessionTest {
                 .coverImages(coverImages)
                 .charge(charge)
                 .enrollment(enrollment)
+                .teacher(teacher)
                 .build();
         assertThat(session.isFree()).isFalse();
     }
@@ -85,6 +92,7 @@ public class SessionTest {
                 .coverImages(coverImages)
                 .charge(charge)
                 .enrollment(enrollment)
+                .teacher(teacher)
                 .build();
         assertThat(session.getRecruitState()).isEqualTo(recruitState);
     }
@@ -96,6 +104,7 @@ public class SessionTest {
                 .coverImages(coverImages)
                 .charge(charge)
                 .enrollment(enrollment)
+                .teacher(teacher)
                 .build();
         NsUser user = new NsUser();
         assertThatThrownBy(() -> session.validateEnrollment(user))
@@ -110,6 +119,7 @@ public class SessionTest {
                 .coverImages(coverImages)
                 .charge(charge)
                 .enrollment(enrollment)
+                .teacher(teacher)
                 .build();
         NsUser user = new NsUser();
         session.enrollUser(user);
@@ -125,6 +135,7 @@ public class SessionTest {
                 .coverImages(coverImages)
                 .charge(charge)
                 .enrollment(enrollment)
+                .teacher(teacher)
                 .build();
         NsUser user = new NsUser();
         session.enrollUser(user);
@@ -139,6 +150,7 @@ public class SessionTest {
                 .coverImages(coverImages)
                 .charge(charge)
                 .enrollment(new Enrollment.Builder().recruitState(RecruitState.CLOSE).build())
+                .teacher(teacher)
                 .build();
         NsUser user = new NsUser();
         assertThatThrownBy(() -> session.validateEnrollment(user))
@@ -153,6 +165,7 @@ public class SessionTest {
                 .coverImages(coverImages)
                 .charge(charge)
                 .enrollment(new Enrollment.Builder().recruitState(RecruitState.CLOSE).build())
+                .teacher(teacher)
                 .build();
         NsUser user = new NsUser();
         assertThatThrownBy(() -> session.validateEnrollment(user))
@@ -165,18 +178,68 @@ public class SessionTest {
         Enrollment enrollment = new Enrollment.Builder()
                 .capacity(1)
                 .build();
+
         Session session = new Session.Builder()
                 .sessionDate(sessionDate)
                 .coverImages(coverImages)
                 .charge(charge)
                 .enrollment(enrollment)
+                .teacher(teacher)
                 .build();
         NsUser user = new NsUser();
-        for (int i = 0; i < capacity + 1; i++) {
+
+        for (int i = 0; i < capacity; i++) {
             session.enrollUser(new NsUser());
         }
         assertThatThrownBy(() -> session.validateEnrollment(user))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("현재는 강의에 등록할 수 없는 상태입니다.");
+    }
+
+    @Test
+    void 강사는_특정_유저를_수강_취소할_수_있다() {
+        Session session = new Session.Builder()
+                .sessionDate(sessionDate)
+                .coverImages(coverImages)
+                .charge(charge)
+                .enrollment(enrollment)
+                .teacher(teacher)
+                .build();
+        NsUser user = new NsUser();
+        session.enrollUser(user);
+        session.cancelEnrollment(user, teacher);
+        assertThat(session.isEnrolled(user)).isFalse();
+    }
+
+    @Test
+    void 강사가_아닌_유저는_수강_취소할_수_없다() {
+        Session session = new Session.Builder()
+                .sessionDate(sessionDate)
+                .coverImages(coverImages)
+                .charge(charge)
+                .enrollment(enrollment)
+                .teacher(teacher)
+                .build();
+        NsUser user = new NsUser();
+        session.enrollUser(user);
+        Teacher anotherTeacher = new Teacher(new NsUser(20L, "다른 강사", "다른강사@nextstep.camp", "다른강사", "다른강사입니다."));
+        assertThatThrownBy(() -> session.cancelEnrollment(user, anotherTeacher))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("강사만 수강 취소가 가능합니다.");
+    }
+
+    @Test
+    void 강사는_특정_유저의_수강을_승인_할_수_있다() {
+        Session session = new Session.Builder()
+                .sessionDate(sessionDate)
+                .coverImages(coverImages)
+                .charge(charge)
+                .enrollment(new Enrollment.Builder().recruitState(RecruitState.CLOSE).build())
+                .teacher(teacher)
+                .build();
+        NsUser user = new NsUser(1L, "user", "1234", "user", "user@can");
+        session.enrollUser(user);
+        session.approveEnrollment(user, teacher);
+        assertThat(session.isEnrolled(user)).isTrue();
     }
 }

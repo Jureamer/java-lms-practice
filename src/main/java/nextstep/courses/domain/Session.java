@@ -1,7 +1,7 @@
 package nextstep.courses.domain;
 
-import nextstep.payments.service.PaymentService;
 import nextstep.users.domain.NsUser;
+import nextstep.users.domain.Teacher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,12 +11,14 @@ public class Session {
     private List<CoverImage> coverImages;
     private Enrollment enrollment;
     private Long charge;
+    private Teacher teacher;
 
-    private Session(SessionDate sessionDate, List<CoverImage> coverImages, Long charge, Enrollment enrollment) {
+    private Session(SessionDate sessionDate, List<CoverImage> coverImages, Long charge, Enrollment enrollment, Teacher teacher) {
         this.sessionDate = sessionDate;
         this.coverImages = coverImages;
         this.charge = charge;
         this.enrollment = enrollment;
+        this.teacher = teacher;
     }
 
     public String getStartDateTime() {
@@ -61,11 +63,32 @@ public class Session {
         return enrollment.getRecruitState();
     }
 
+    public boolean isEnrolled(NsUser user) {
+        return enrollment.isEnrolled(user);
+    }
+
+    public void cancelEnrollment(NsUser user, Teacher teacher) {
+        if (!this.teacher.equals(teacher)) {
+            throw new IllegalArgumentException("강사만 수강 취소가 가능합니다.");
+        }
+
+        enrollment.cancel(user);
+    }
+
+    public void approveEnrollment(NsUser user, Teacher teacher) {
+        if (!this.teacher.match(teacher)) {
+            throw new IllegalArgumentException("강사만 수강 승인이 가능합니다.");
+        }
+
+        enrollment.approve(user);
+    }
+
     public static class Builder {
         private SessionDate sessionDate;
         private List<CoverImage> coverImages = new ArrayList<>();
         private Enrollment enrollment;
         private Long charge;
+        private Teacher teacher;
 
         public Builder sessionDate(SessionDate sessionDate) {
             this.sessionDate = sessionDate;
@@ -87,8 +110,13 @@ public class Session {
             return this;
         }
 
+        public Builder teacher(Teacher teacher) {
+            this.teacher = teacher;
+            return this;
+        }
+
         public Session build() {
-            return new Session(sessionDate, coverImages, charge, enrollment);
+            return new Session(sessionDate, coverImages, charge, enrollment, teacher);
         }
     }
 }

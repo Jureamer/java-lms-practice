@@ -96,6 +96,10 @@ public class NsUser {
         return matchUserId(target.getUserId());
     }
 
+    public boolean matchUser(Teacher target) {
+        return matchUserId(target.getUserId());
+    }
+
     private boolean matchUserId(String userId) {
         return this.userId.equals(userId);
     }

@@ -15,8 +15,6 @@ public class Course {
 
     private LocalDateTime updatedAt;
 
-    public Course() {
-    }
 
     public Course(String title, Long creatorId, int cohort) {
 

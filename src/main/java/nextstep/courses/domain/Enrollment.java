@@ -9,19 +9,19 @@ public class Enrollment {
     private static int MAX_CAPACITY = 9999;
 
     private int capacity;
-    private List<NsUser> users;
+    private List<NsUser> waitingUsers = new ArrayList<>();
+    private List<NsUser> students = new ArrayList<>();
     private Status status;
     private RecruitState recruitState;
 
-    private Enrollment(int capacity, List<NsUser> users, Status status, RecruitState recruitState) {
+    private Enrollment(int capacity, Status status, RecruitState recruitState) {
         this.capacity = capacity;
-        this.users = users;
         this.status = status;
         this.recruitState = recruitState;
     }
 
     public boolean canEnroll() {
-        return isOpen() && recruitState == RecruitState.OPEN && capacity > users.size();
+        return isOpen() && recruitState == RecruitState.OPEN && capacity > students.size();
     }
 
     public Status getStatus() {
@@ -29,11 +29,11 @@ public class Enrollment {
     }
 
     public void enroll(NsUser user) {
-        users.add(user);
+        waitingUsers.add(user);
     }
 
     public boolean isEnrolled(NsUser user) {
-        return users.contains(user);
+        return students.contains(user);
     }
 
     public RecruitState getRecruitState() {
@@ -44,19 +44,22 @@ public class Enrollment {
         return status == Status.OPEN;
     }
 
+    public void cancel(NsUser user) {
+        waitingUsers.remove(user);
+    }
+
+    public void approve(NsUser user) {
+        students.add(user);
+        waitingUsers.remove(user);
+    }
+
     public static class Builder {
         private int capacity = MAX_CAPACITY;
-        private List<NsUser> users = new ArrayList<>();
         private Status status = Status.READY;
         private RecruitState recruitState = RecruitState.OPEN;
 
         public Builder capacity(int capacity) {
             this.capacity = capacity;
-            return this;
-        }
-
-        public Builder users(List<NsUser> users) {
-            this.users = users;
             return this;
         }
 
@@ -71,7 +74,7 @@ public class Enrollment {
         }
 
         public Enrollment build() {
-            return new Enrollment(capacity, users, status, recruitState);
+            return new Enrollment(capacity, status, recruitState);
         }
     }
 
